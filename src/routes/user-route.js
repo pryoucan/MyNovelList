@@ -8,10 +8,11 @@ import { userAuthentication } from "../middlewares/auth-user.middleware.js";
 
 const router = Router();
 
-router.route("/user/register").post(registerUser);
-router.route("/user/login").post(loginUser);
-router.route("/novel/search").get(userAuthentication, searchNovel);
-router.route("/novel/create").post(userAuthentication, createNovel);
-router.route("/novel/delete/:novelId").delete(userAuthentication, deleteNovel);
+router.post("/users/register", registerUser);
+router.post("/users/login", loginUser);
+
+router.get("/novels", userAuthentication, searchNovel);
+router.post("/novels", userAuthentication, createNovel);
+router.delete("/novels/:novelId", userAuthentication, deleteNovel);
 
 export default router;
