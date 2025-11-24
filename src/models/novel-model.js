@@ -28,6 +28,11 @@ const novelSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["Ongoing", "Completed", "Discontinued"],
+      default: null
+    },
+    readingStatus: {
+      type: String,
       enum: ["Reading", "Completed", "On Hold", "Plan To Read", "Dropped"],
       default: null,
     },
