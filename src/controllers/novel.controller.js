@@ -2,21 +2,24 @@ import Novel from "../models/novel-model.js";
 
 export const createNovel = async (req, res) => {
   try {
-    const { name, author, chapter, totalChapter, status } = req.body;
-    if (!name) {
+    const novelDetails = req.body;
+    novelDetails.user = req.user.id;
+
+    if (!novelDetails.name) {
       return res.status(401).json({ message: "Novel name is required" });
     }
 
-    const newNovelData = await Novel.create({
-      // name, chapter, totalChapter... shorthand, doesn't need to write key value, because
-      // both the naming conventions are same, apply everywhere related to objects.
-      name,
-      author,
-      chapter,
-      totalChapter,
-      status,
-      user: req.user.id,
+    const existingNovel = await Novel.findOne({
+      name: novelDetails.name.trim().toLowerCase(),
+      author: (novelDetails.author || "").trim().toLowerCase(),
+      user: req.user.id
     });
+
+    if (existingNovel) {
+      return res.status(400).json({ message: "Novel already exists" });
+    }
+
+    const newNovelData = await Novel.create(novelDetails);
 
     return res.status(201).json({
       message: "Novel created successfully",

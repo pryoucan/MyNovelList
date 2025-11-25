@@ -5,17 +5,19 @@ const novelSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: true
     },
     name: {
       type: String,
       required: true,
       trim: true,
+      lowercase: true
     },
     author: {
       type: String,
       trim: true,
-      default: null
+      lowercase: true,
+      default: ""
     },
     chapter: {
       type: Number,
@@ -24,31 +26,40 @@ const novelSchema = new mongoose.Schema(
     },
     totalChapter: {
       type: Number,
-      default: null,
+      required: [ function() {
+        return (
+        this.publishingStatus === "Finished" ||
+        this.status === "Completed"
+        );
+      },
+      "Total chapters required when novel is finished publishing"
+    ],
+      default: null
+    },
+    publishingStatus: {
+      type: String,
+      enum: ["Ongoing", "Finished", "Discontinued", "On Hiatus"],
+      default: null
     },
     status: {
       type: String,
-      enum: ["Ongoing", "Completed", "Discontinued"],
-      default: null
-    },
-    readingStatus: {
-      type: String,
       enum: ["Reading", "Completed", "On Hold", "Plan To Read", "Dropped"],
-      default: null,
+      default: null
     },
     startedAt: {
       type: Date,
-      default: null,
+      default: null
     },
     completedAt: {
       type: Date,
-      default: null,
+      default: null
     },
   },
   { timestamps: true }
 );
 
 novelSchema.pre("save", function (next) {
+
   if (this.status === "Completed" && !this.completedAt) {
     this.completedAt = new Date();
   }
