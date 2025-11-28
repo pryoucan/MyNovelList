@@ -77,6 +77,47 @@ export const searchNovel = async (req, res) => {
   }
 };
 
+export const editNovel = async (req, res) => {
+  const { chapter, totalChapter, status, startedAt, completedAt } = req.body;
+  const { novelId } = req.params;
+  const userId = req.user.id;
+
+  if(status === "Completed" && !totalChapter) {
+    return res.status(400).json({ 
+      message: "Total Chapter required when reading status is completed"
+    });
+  }
+
+  if(status === "Completed" && chapter > totalChapter) {
+    return res.status(400).json({ 
+      message: "Read chapter cannot be more than Total Chpater" 
+    });
+  }
+
+  try {
+    const updatedNovel = await Novel.findOneAndUpdate(
+      { user: userId, _id: novelId },
+      { chapter, totalChapter, status, startedAt, completedAt },
+      { new: true }
+    ).lean();
+
+    if(!updatedNovel) {
+      return res.status(404).json({ 
+        message: "Novel not found"
+       });
+    }
+
+    return res.status(200).json({ 
+      message: "Novel updated successfully",
+      novel: updatedNovel
+     });
+  }
+  catch(error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+}
+
 export const deleteNovel = async (req, res) => {
   try {
     const { novelId } = req.params;

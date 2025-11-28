@@ -38,8 +38,8 @@ const novelSchema = new mongoose.Schema(
     },
     publishingStatus: {
       type: String,
-      enum: ["Ongoing", "Finished", "Discontinued", "On Hiatus"],
-      default: null
+      enum: ["Ongoing", "Finished", "Discontinued", "On Hiatus", "Unknown"],
+      default: "Unknown"
     },
     status: {
       type: String,

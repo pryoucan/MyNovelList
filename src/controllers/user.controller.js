@@ -9,7 +9,9 @@ export const registerUser = async (req, res) => {
     }
 
     if(password.toString().length < 8) {
-      return res.status(400).json({ message: "Password length should be more than 8" });
+      return res.status(400).json({ 
+        message: "Password must be atleast 8 characters long" 
+      });
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -50,7 +52,7 @@ export const loginUser = async (req, res) => {
       return res.status(201).json({ message: "Login Successfull", token: token });
     } 
     else {
-      return res.status(400).json({ message: "Enter valid email or password" });
+      return res.status(400).json({ message: "Invalid email address or password" });
     }
   } 
   catch (error) {
