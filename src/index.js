@@ -1,18 +1,18 @@
 import express from "express";
-import dbConnectivity from "./config/db-config.js";
+import dbConnectivity from "./config/db.config.js";
 import router from "./routes/user-route.js"
 import dotenv from 'dotenv';
 import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded());
 app.use(cors());
 
 dotenv.config();
 
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
 app.use('/api', router);
 
 const runServer = async () => {

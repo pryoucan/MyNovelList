@@ -1,5 +1,7 @@
-import User from "../models/user-model.js";
+import novelModel from "../models/novel.model.js";
+import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import { otpGenerator } from "../Utils/otp-generator.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -8,6 +10,11 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    if(name.length < 3) {
+      return res.status(400).json({ 
+        message: "Name must be atleast 3 characters long" 
+      });
+    }
     if(password.toString().length < 8) {
       return res.status(400).json({ 
         message: "Password must be atleast 8 characters long" 
@@ -60,3 +67,48 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({ message: "Something went wrong" });
   }
 };
+
+export const resetPassword = async(req, res) => {
+  const { otp } = req.body;
+  const ogOTP = req.otp;
+
+  if(otp !== ogOTP) {
+    return res.status(400).json({ message: "OTP is incorrect" });
+  }
+  try {
+    let newUserPassword = req.body;
+    const userEmail = req.user.email;
+    const userId = req.user.id;
+
+    const user = await Novel.findOne({ email: userEmail, user: userId });
+    if(!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const matchNewAndOldPassword = user.matchPassword(newUserPassword);
+    if(matchNewAndOldPassword) {
+      return res.status(400).json({ 
+        message: "New password cannont be the same as old one" 
+      });
+    }
+
+    newUserPassword = await bcrypt.hash(newUserPassword, 10);
+
+    const updatedPassword = await Novel.findOneAndUpdate(
+      {
+        email: userEmail, userPassword: password, user: userId
+      },
+      {
+        password: newUserPassword
+      },
+      {
+        new: true
+      }
+    ).lean();
+
+    return res.status(201).json({ message: "Password updated successfully" });
+  }
+  catch(error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+}

@@ -1,4 +1,4 @@
-import Novel from "../models/novel-model.js";
+import Novel from "../models/novel.model.js"
 
 export const createNovel = async (req, res) => {
   try {
@@ -78,7 +78,7 @@ export const searchNovel = async (req, res) => {
 };
 
 export const editNovel = async (req, res) => {
-  const { chapter, totalChapter, status, startedAt, completedAt } = req.body;
+  const { status, chapter, startedAt, completedAt } = req.body;
   const { novelId } = req.params;
   const userId = req.user.id;
 
