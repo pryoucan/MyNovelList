@@ -4,6 +4,11 @@ const userNovelSchema = new mongoose.Schema(
   {
     novel: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "GlobalNovel",
+      required: true
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true
     },
@@ -12,7 +17,7 @@ const userNovelSchema = new mongoose.Schema(
       default: 0,
       min: 0
     },
-    score: {
+    rating: {
       type: Number,
       min: 1,
       max: 10
@@ -20,7 +25,7 @@ const userNovelSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["Reading", "Completed", "On Hold", "Plan To Read", "Dropped"],
-      default: null
+      default: "Reading"
     },
     startedAt: {
       type: Date,
@@ -35,4 +40,4 @@ const userNovelSchema = new mongoose.Schema(
 );
 
 
-export default mongoose.model("UserNovel", userNovelSchema);
+export const UserNovel = mongoose.model("UserNovel", userNovelSchema);

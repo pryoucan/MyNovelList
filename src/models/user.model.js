@@ -19,7 +19,8 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minlength: 8,
+      min: 8,
+      max: 20
     },
   },
   { timestamps: true }
@@ -44,4 +45,4 @@ userSchema.methods.toJSON = function () {
     return user;
 }
 
-export default mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);

@@ -1,44 +1,49 @@
 import mongoose, { Schema } from "mongoose";
 
-const globalNovelSchema = new Schema(
+const novelAddRequestSchema = new Schema(
   {
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     englishTitle: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     alternativeTitles: {
       type: [String],
-      default: []
+      default: null
     },
     author: {
       type: String,
       trim: true,
-      required: true
+      required: true,
     },
     language: {
       type: String,
       enum: ["Mandarin", "English"],
-      required: true
+      required: true,
     },
     completelyTranslated: {
       type: Boolean,
-      default: false
+      default: false,
     },
     originalPublisher: {
-      type: String, 
+      type: String,
       enum: ["Qidian", "Zongheng", "Jinjiang", "17K"],
-      default: null
+      default: null,
     },
     englishPublisher: {
       type: String,
       enum: ["Wuxiaworld", "Web Novel"],
-      default: null
+      default: null,
     },
     status: {
       type: String,
       enum: ["Ongoing", "Completed", "On Hiatus", "Cancelled"],
-      required: true
+      default: "Ongoing"
     },
     totalChapters: {
       type: Number,
@@ -47,31 +52,29 @@ const globalNovelSchema = new Schema(
     },
     coverImage: {
       type: String,
-      default: null
+      default: null,
     },
     synopsis: {
       type: String,
-      default: null
+      default: null,
     },
     genre: {
       type: [String],
-      required: true
+      required: true,
+    },
+    approved: {
+      type: Boolean,
+      default: false,
     },
     startYear: {
       type: Number,
-      default: null
+      default: null,
     },
     finishedYear: {
       type: Number,
       default: null,
-    },
-    approved: {
-      type: Boolean,
-      default: true
     }
   },
   { timestamps: true });
 
-globalNovelSchema.index({ englishTitle: "text", alternativeTitles: "text" });
-
-export const Globalnovel = mongoose.model("GlobalNovel", globalNovelSchema);
+export const NovelAddRequest = mongoose.model("NovelAddRequest", novelAddRequestSchema);
