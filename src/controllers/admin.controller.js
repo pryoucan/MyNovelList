@@ -1,18 +1,62 @@
-import { GlobalNovel } from "../models/global-novel.model.js";
-import { NovelAddRequest } from "../models/novel-add-request.model.js"
+import { Admin } from "../models/admin.model";
+import jwt from "jsonwebtoken";
 
-export const viewRequests = async (req, res) => {
+export const registerAdmin = async (req, res) => {
+
+    const existingAdminByEmail = await Admin.findOne({ email: req.body.email });
+    if (existingAdminByEmail) {
+        return res.status(400).json({
+            message: "Admin already exists, log in instead"
+        });
+    }
+
+    const existingAdminByUsername = await Admin.findOne({ username: req.body.username });
+    if (existingAdminByUsername) {
+        return res.status(400).json({
+            message: "Username already in use"
+        });
+    }
+
+    if (!req.body.secret_key === process.env.ADMIN_KEY) {
+        return res.status(401).json({
+            error: "Registeration denied"
+        });
+    }
+
     try {
-        const novel = await NovelAddRequest.find({});
-        if (novel) {
+        delete req.body.secret_key;
+        const admin = await Admin.create(req.body);
+        return res.status(201).json({
+            message: "Admin registered successfull",
+            admin
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+export const loginAdmin = async (req, res) => {
+
+    const { email, password } = req.body;
+    try {
+        const admin = await Admin.findOne({ email });
+        if (admin && (admin.matchPassword(password))) {
+            const token = await jwt.sign({ id: admin._id },
+                process.env.JWT_SECRETKEY,
+                { expiresIn: '1d' }
+            );
+
             return res.status(200).json({
-                message: "Novel fetched successfully",
-                novels: novel
+                message: "Admin logged in successfully",
+                token
             });
         }
         else {
             return res.status(404).json({
-                message: "No record found"
+                message: "Invalid email or password"
             });
         }
     }
@@ -23,41 +67,4 @@ export const viewRequests = async (req, res) => {
     }
 }
 
-export const approveRequests = async (req, res) => {
-    const { novelID } = req.params;
-    try {
-        const novelToApprove = await NovelAddRequest.findById(novelID);
-
-        if (!novelToApprove) {
-            return res.status(404).json({
-                message: "Novel not found",
-            });
-        }
-
-        const novelData = novelToApprove.toObject();
-
-        delete novelData._id;
-        delete novelData.createdBy;
-        delete novelData.approved;
-        delete novelData.createdAt;
-        delete novelData.updatedAt;
-
-        const globalNovel = await GlobalNovel.create({
-            ...novelData,
-            approved: true
-        });
-
-        await novelToApprove.deleteOne();
-
-        return res.status(200).json({
-            message: "Approved by admin: Novel added to global db",
-            novel: globalNovel
-        });
-    }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            message: "Something went wrong"
-        });
-    }
-}
+export { registerAdmin, loginAdmin }
