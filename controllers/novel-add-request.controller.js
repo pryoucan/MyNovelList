@@ -1,6 +1,6 @@
 import { NovelAddRequest } from "../models/novel-add-request.model.js";
 
-export const novelAddRequest = async (req, res) => {
+const novelAddRequest = async (req, res) => {
 
     try {
         const novel = await NovelAddRequest.create({
@@ -20,3 +20,5 @@ export const novelAddRequest = async (req, res) => {
         });
     }
 }
+
+export { novelAddRequest };

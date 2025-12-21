@@ -1,7 +1,7 @@
 import { GlobalNovel } from "../models/global-novel.model.js";
 import { NovelAddRequest } from "../models/novel-add-request.model.js"
 
-export const viewRequests = async (req, res) => {
+const viewRequests = async (req, res) => {
     try {
         const novel = await NovelAddRequest.find({});
         if (novel) {
@@ -23,7 +23,8 @@ export const viewRequests = async (req, res) => {
     }
 }
 
-export const approveRequests = async (req, res) => {
+
+const approveRequests = async (req, res) => {
     const { novelID } = req.params;
     try {
         const novelToApprove = await NovelAddRequest.findById(novelID);
@@ -61,3 +62,32 @@ export const approveRequests = async (req, res) => {
         });
     }
 }
+
+
+const rejectRequests = async (req, res) => {
+    const { novelID } = req.params;
+    try {
+        const novelToReject = await NovelAddRequest.findById(novelID);
+
+        if (!novelToReject) {
+            return res.status(404).json({
+                message: "Novel not found",
+            });
+        }
+
+        const deleteResult = await NovelAddRequest.deleteOne({ _id: novelID });
+        if (deleteResult.deletedCount === 1) {
+            return res.status(200).json({
+                message: "Novel rejected & deleted successfully",
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+}
+
+export { viewRequests, approveRequests, rejectRequests };
