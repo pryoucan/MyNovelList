@@ -74,4 +74,4 @@ const globalNovelSchema = new Schema(
 
 globalNovelSchema.index({ englishTitle: "text", alternativeTitles: "text" });
 
-export const Globalnovel = mongoose.model("GlobalNovel", globalNovelSchema);
+export const GlobalNovel = mongoose.model("GlobalNovel", globalNovelSchema);

@@ -4,7 +4,7 @@ import { novelAddRequestSchema } from "../validators/novel-add-request.validator
 import { novelAddRequest } from "../controllers/novel-add-request.controller.js";
 import { userAuthentication } from "../middlewares/auth-user.middleware.js";
 import { adminAuthentication } from "../middlewares/auth-admin.middleware.js";
-import { approveRequests, viewRequests } from "../controllers/admin.controller.js";
+import { approveRequests, viewRequests } from "../controllers/admin-novel.controller.js";
 import { globalNovelSchema } from "../validators/global-novel.validator.js";
 
 

@@ -1,7 +1,7 @@
-import { Admin } from "../models/admin.model";
+import  { Admin } from "../models/admin.model.js"
 import jwt from "jsonwebtoken";
 
-export const registerAdmin = async (req, res) => {
+const registerAdmin = async (req, res) => {
 
     const existingAdminByEmail = await Admin.findOne({ email: req.body.email });
     if (existingAdminByEmail) {
@@ -38,7 +38,7 @@ export const registerAdmin = async (req, res) => {
     }
 }
 
-export const loginAdmin = async (req, res) => {
+const loginAdmin = async (req, res) => {
 
     const { email, password } = req.body;
     try {

@@ -1,25 +1,9 @@
-import novelModel from "../models/novel.model.js";
-import User from "../models/user.model.js";
+import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { otpGenerator } from "../Utils/otp-generator.js";
 
-export const registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    if(name.length < 3) {
-      return res.status(400).json({ 
-        message: "Name must be atleast 3 characters long" 
-      });
-    }
-    if(password.toString().length < 8) {
-      return res.status(400).json({ 
-        message: "Password must be atleast 8 characters long" 
-      });
-    }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email already registered" });
@@ -40,8 +24,8 @@ export const registerUser = async (req, res) => {
   }
 };
 
-export const loginUser = async (req, res) => {
-  try {   
+const loginUser = async (req, res) => {
+  try {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -57,22 +41,22 @@ export const loginUser = async (req, res) => {
       });
 
       return res.status(201).json({ message: "Login Successfull", token: token });
-    } 
+    }
     else {
       return res.status(400).json({ message: "Invalid email address or password" });
     }
-  } 
+  }
   catch (error) {
     console.log(error);
     return res.status(400).json({ message: "Something went wrong" });
   }
 };
 
-export const resetPassword = async(req, res) => {
+const resetPassword = async (req, res) => {
   const { otp } = req.body;
   const ogOTP = req.otp;
 
-  if(otp !== ogOTP) {
+  if (otp !== ogOTP) {
     return res.status(400).json({ message: "OTP is incorrect" });
   }
   try {
@@ -81,14 +65,14 @@ export const resetPassword = async(req, res) => {
     const userId = req.user.id;
 
     const user = await Novel.findOne({ email: userEmail, user: userId });
-    if(!user) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     const matchNewAndOldPassword = user.matchPassword(newUserPassword);
-    if(matchNewAndOldPassword) {
-      return res.status(400).json({ 
-        message: "New password cannont be the same as old one" 
+    if (matchNewAndOldPassword) {
+      return res.status(400).json({
+        message: "New password cannont be the same as old one"
       });
     }
 
@@ -108,7 +92,9 @@ export const resetPassword = async(req, res) => {
 
     return res.status(201).json({ message: "Password updated successfully" });
   }
-  catch(error) {
+  catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
   }
 }
+
+export { registerUser, loginUser, resetPassword };

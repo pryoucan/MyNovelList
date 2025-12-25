@@ -1,6 +1,8 @@
 import express from "express";
 import dbConnectivity from "./config/db.config.js";
-import router from "./routes/user-route.js"
+import { userRouter } from "./routes/user.route.js";
+import { novelRouter } from "./routes/novel.route.js";
+import { adminRouter } from "./routes/admin.route.js";
 import dotenv from 'dotenv';
 import cors from "cors";
 
@@ -13,7 +15,7 @@ dotenv.config();
 
 const port = process.env.PORT || 3000;
 
-app.use('/api', router);
+app.use('/api', userRouter, novelRouter, adminRouter);
 
 const runServer = async () => {
     try {
