@@ -1,21 +1,61 @@
 import { z } from "zod";
 
-export const novelAddRequestSchema = z.object({
-  englishTitle: z.string().min(1),
+export const novelAddRequestValidator = z
+  .object({
+    title: z.string().min(1, "Title is required"),
 
-  alternativeTitles: z.array(z.string()).optional(),
+    originalTitle: z.string().nullable().optional(),
 
-  author: z.string().min(1),
+    author: z.string().min(1, "Author is required"),
 
-  language: z.enum(["Mandarin", "Korean", "Japanese", "English"]),
+    originalLanguage: z.enum(["zh", "en"]),
 
-  novelStatus: z.enum(["Ongoing", "Completed", "On Hiatus", "Cancelled"]),
+    publishers: z
+      .object({
+        original: z
+          .enum(["Qidian", "Zongheng", "Jinjiang", "17K"])
+          .nullable()
+          .optional(),
 
-  synopsis: z.string().optional(),
+        english: z
+          .enum(["Wuxiaworld", "Web Novel"])
+          .nullable()
+          .optional(),
+      })
+      .optional(),
 
-  genre: z.array(z.string()).min(1),
+    publication: z.object({
+      status: z.enum([
+        "Ongoing",
+        "Completed",
+        "Upcoming",
+        "On Hiatus",
+        "Cancelled",
+      ]),
+      startYear: z.number().int().optional(),
+      endYear: z.number().int().optional(),
+    }),
 
-  totalChapters: z.number().optional(),
+    chapterCount: z.number().int().min(0).nullable().optional(),
 
-  finishedYear: z.number().optional(),
-});
+    synopsis: z.string().optional(),
+
+    genres: z.array(z.string()).min(1, "At least one genre is required"),
+  })
+  .refine(
+    (data) => {
+      if (data.publication.status === "Completed") {
+        return (
+          data.chapterCount !== null &&
+          data.chapterCount !== undefined &&
+          data.publication.endYear !== undefined
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "chapterCount and publication.endYear are required when status is Completed",
+      path: ["chapterCount"],
+    }
+  );

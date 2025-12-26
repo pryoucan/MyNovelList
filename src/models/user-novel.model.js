@@ -7,37 +7,48 @@ const userNovelSchema = new mongoose.Schema(
       ref: "GlobalNovel",
       required: true
     },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true
     },
+
     progress: {
       type: Number,
-      default: 0,
-      min: 0
+      min: 0,
+      default: 0
     },
+
     rating: {
       type: Number,
       min: 1,
-      max: 10
+      max: 10,
+      default: null
     },
-    status: {
+
+    readingStatus: {
       type: String,
       enum: ["Reading", "Completed", "On Hold", "Plan To Read", "Dropped"],
       default: "Reading"
     },
+
     startedAt: {
       type: Date,
       default: null
     },
+
     completedAt: {
       type: Date,
       default: null
-    },
+    }
   },
   { timestamps: true }
 );
 
+userNovelSchema.index(
+  { user: 1, novel: 1 },
+  { unique: true }
+);
 
 export const UserNovel = mongoose.model("UserNovel", userNovelSchema);

@@ -2,7 +2,8 @@ import { GlobalNovel } from "../models/global-novel.model.js";
 import { NovelAddRequest } from "../models/novel-add-request.model.js"
 
 const viewRequest = async (req, res) => {
-    if (req.body.role !== "ADMIN") {
+
+    if (req.user.role !== "ADMIN") {
         return res.status(403).json({ message: "Access denied" });
     }
     try {
@@ -26,12 +27,13 @@ const viewRequest = async (req, res) => {
 
 
 const approveRequest = async (req, res) => {
-    if (req.body.role !== "ADMIN") {
+
+    if (req.user.role !== "ADMIN") {
         return res.status(403).json({ message: "Access denied" });
     }
-    const { novelID } = req.params;
+    const { novelId } = req.params;
     try {
-        const novelToApprove = await NovelAddRequest.findById(novelID);
+        const novelToApprove = await NovelAddRequest.findById(novelId);
         if (!novelToApprove) {
             return res.status(404).json({
                 message: "Novel not found",
@@ -68,12 +70,13 @@ const approveRequest = async (req, res) => {
 
 
 const rejectRequest = async (req, res) => {
-    if (req.body.role !== "ADMIN") {
+
+    if (req.user.role !== "ADMIN") {
         return res.status(403).json({ message: "Access denied" });
     }
-    const { novelID } = req.params;
+    const { novelId } = req.params;
     try {
-        const novelToReject = await NovelAddRequest.findById(novelID);
+        const novelToReject = await NovelAddRequest.findById(novelId);
 
         if (!novelToReject) {
             return res.status(404).json({
@@ -81,7 +84,7 @@ const rejectRequest = async (req, res) => {
             });
         }
 
-        const deleteResult = await NovelAddRequest.deleteOne({ _id: novelID });
+        const deleteResult = await NovelAddRequest.deleteOne({ _id: novelId });
         if (deleteResult.deletedCount === 1) {
             return res.status(200).json({
                 message: "Novel rejected & deleted successfully",

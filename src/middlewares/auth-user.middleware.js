@@ -10,7 +10,7 @@ const userAuthentication = async (req, res, next) => {
   try {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
-    req.user = { id: decoded.id };
+    req.user = { id: decoded.id, role: decoded.role, username: decoded.username };
 
     next();
   } catch (error) {

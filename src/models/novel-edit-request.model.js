@@ -16,7 +16,7 @@ const novelEditRequestSchema = new Schema(
       type: Object,
       required: true,
     },
-    approved: {
+    isApproved: {
       type: Boolean,
       default: false,
     },

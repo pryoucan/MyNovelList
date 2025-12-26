@@ -7,72 +7,83 @@ const novelAddRequestSchema = new Schema(
       ref: "User",
       required: true,
     },
-    englishTitle: {
+    
+    title: {
       type: String,
       required: true,
+      trim: true
+    },
+
+    originalTitle: {
+      type: String,
       trim: true,
+      required: true
     },
-    alternativeTitles: {
-      type: [String],
-      default: null
-    },
+
     author: {
       type: String,
       trim: true,
-      required: true,
+      require: true
     },
-    language: {
+    
+    originalLanguage: {
       type: String,
-      enum: ["Mandarin", "English"],
-      required: true,
+      enum: ["zh", "en"],
+      required: true
     },
-    completelyTranslated: {
+
+    isFullyTranslated: {
       type: Boolean,
-      default: false,
+      default: false
     },
-    originalPublisher: {
-      type: String,
-      enum: ["Qidian", "Zongheng", "Jinjiang", "17K"],
-      default: null,
+
+    publishers: {
+      original: {
+        type: String,
+        enum: ["Qidian", "Zongheng", "Jinjiang", "17K"],
+        default: null
+      },
+      english: {
+        type: String,
+        enum: ["Wuxiaworld", "Web Novel"],
+        default: null
+      }
     },
-    englishPublisher: {
-      type: String,
-      enum: ["Wuxiaworld", "Web Novel"],
-      default: null,
+
+    publication: {
+      status: {
+        type: String,
+        enum: ["Ongoing", "Completed", "Upcoming", "On Hiatus", "Cancelled"],
+        required: true
+      },
+      startYear: Number,
+      endYear: Number
     },
-    novelStatus: {
-      type: String,
-      enum: ["Ongoing", "Completed", "On Hiatus", "Cancelled"],
-      default: "Ongoing"
-    },
-    totalChapters: {
+
+    chapterCount: {
       type: Number,
       min: 0,
-      default: null,
+      default: null
     },
+
     coverImage: {
       type: String,
-      default: null,
+      default: null
     },
+
     synopsis: {
       type: String,
-      default: null,
+      default: null
     },
-    genre: {
+
+    genres: {
       type: [String],
-      required: true,
+      required: true
     },
-    approved: {
+
+    isApproved: {
       type: Boolean,
-      default: false,
-    },
-    startYear: {
-      type: Number,
-      default: null,
-    },
-    finishedYear: {
-      type: Number,
-      default: null,
+      default: false
     }
   },
   { timestamps: true });

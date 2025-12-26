@@ -2,76 +2,90 @@ import mongoose, { Schema } from "mongoose";
 
 const globalNovelSchema = new Schema(
   {
-    englishTitle: {
+    title: {
       type: String,
       required: true,
       trim: true
     },
-    alternativeTitles: {
-      type: [String],
-      default: []
+
+    originalTitle: {
+      type: String,
+      default: null
     },
+
     author: {
       type: String,
       trim: true,
       required: true
     },
-    language: {
+
+    originalLanguage: {
       type: String,
-      enum: ["Mandarin", "English"],
+      enum: ["zh", "en"],
       required: true
     },
-    completelyTranslated: {
+
+    isFullyTranslated: {
       type: Boolean,
       default: false
     },
-    originalPublisher: {
-      type: String, 
-      enum: ["Qidian", "Zongheng", "Jinjiang", "17K"],
-      default: null
+
+    publishers: {
+      original: {
+        type: String,
+        enum: ["Qidian", "Zongheng", "Jinjiang", "17K"],
+        default: null
+      },
+      english: {
+        type: String,
+        enum: ["Wuxiaworld", "Web Novel"],
+        default: null
+      }
     },
-    englishPublisher: {
-      type: String,
-      enum: ["Wuxiaworld", "Web Novel"],
-      default: null
+
+    publication: {
+      status: {
+        type: String,
+        enum: ["Ongoing", "Completed", "Upcoming", "On Hiatus", "Cancelled"],
+        required: true
+      },
+      startYear: Number,
+      endYear: Number
     },
-    novelStatus: {
-      type: String,
-      enum: ["Ongoing", "Completed", "On Hiatus", "Cancelled"],
-      required: true
-    },
-    totalChapters: {
+
+    chapterCount: {
       type: Number,
       min: 0,
-      default: null,
+      default: null
     },
+
     coverImage: {
       type: String,
       default: null
     },
+
     synopsis: {
       type: String,
       default: null
     },
-    genre: {
+
+    genres: {
       type: [String],
       required: true
     },
-    startYear: {
-      type: Number,
-      default: null
-    },
-    finishedYear: {
-      type: Number,
-      default: null,
-    },
-    approved: {
+
+    isApproved: {
       type: Boolean,
       default: true
     }
   },
-  { timestamps: true });
+  { timestamps: true }
+);
 
-globalNovelSchema.index({ englishTitle: "text", alternativeTitles: "text" });
+globalNovelSchema.index({
+  title: "text",
+  originalTitle: "text",
+  author: "text"
+});
 
 export const GlobalNovel = mongoose.model("GlobalNovel", globalNovelSchema);

@@ -1,62 +1,67 @@
 import { z } from "zod";
 
-export const globalNovelSchema = z.object({
-    
-    englishTitle: 
-    z.string().min(1),
+export const globalNovelValidator = z
+  .object({
 
-    alternativeTitles: 
-    z.array(z.string()).optional(),
-    
-    author: 
-    z.string().min(1),
-    
-    language: 
-    z.enum(["Mandarin", "English"]),
-    
-    completelyTranslated: 
-    z.boolean().optional(),
+    title: z.string().min(1, "Title is required"),
 
-    originalPublisher:
-    z.enum(["Qidian", "Zongheng", "Jinjiang", "17K"]).optional(),
+    originalTitle: z.string().nullable().optional(),
 
-    englishPublisher:
-    z.enum(["Wuxiaworld", "Web Novel"]).optional(),
+    author: z.string().min(1, "Author is required"),
 
-    novelStatus:
-    z.enum(["Ongoing", "Completed", "On Hiatus", "Cancelled"]),
+    originalLanguage: z.enum(["zh", "en"]),
 
-    totalChapters:
-    z.number().int().min(0).nullable().optional(),
+    isFullyTranslated: z.boolean().optional(),
 
-    coverImage:
-    z.string().url().optional(),
+    publishers: z
+      .object({
+        original: z
+          .enum(["Qidian", "Zongheng", "Jinjiang", "17K"])
+          .nullable()
+          .optional(),
 
-    synopsis:
-    z.string().optional(),
+        english: z.enum(["Wuxiaworld", "Web Novel"]).nullable().optional(),
+      })
+      .optional(),
 
-    genre:
-    z.array(z.string()).min(1),
+    publication: z.object({
+      status: z.enum([
+        "Ongoing",
+        "Completed",
+        "Upcoming",
+        "On Hiatus",
+        "Cancelled",
+      ]),
 
-    approved:
-    z.boolean().optional(),
+      startYear: z.number().int().optional(),
 
-    startYear:
-    z.number().optional(),
+      endYear: z.number().int().optional(),
+    }),
 
-    finishedYear:
-    z.number().optional()
-}).refine(
+    chapterCount: z.number().int().min(0).nullable().optional(),
+
+    coverImage: z.string().url().optional(),
+
+    synopsis: z.string().optional(),
+
+    genres: z.array(z.string()).min(1, "At least one genre is required"),
+
+    isApproved: z.boolean().optional(),
+  })
+  .refine(
     (data) => {
-        if(data.status === "Completed") {
-            return data.totalChapters != null && 
-            data.finishedYear != null;
-        }
-
-        return true;
+      if (data.publication.status === "Completed") {
+        return (
+          data.chapterCount !== null &&
+          data.chapterCount !== undefined &&
+          data.publication.endYear !== undefined
+        );
+      }
+      return true;
     },
     {
-        message: `Totalchapters and FinishedYear required
-        when publishing status is completed`, path: ["totalChapters"],
+      message:
+        "chapterCount and publication.endYear are required when status is Completed",
+      path: ["chapterCount"],
     }
-);
+  );

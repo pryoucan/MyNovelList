@@ -36,7 +36,6 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    console.log("hi")
     const { email, password, adminkey } = req.body;
     const user = await User.findOne({ email });
     if (!user || !(await user.matchPassword(password))) {
@@ -50,7 +49,7 @@ const loginUser = async (req, res) => {
       }
     }
 
-    const token = await jwt.sign({ id: user._id, role: user.role },
+    const token = await jwt.sign({ id: user._id, role: user.role, username: user.username },
       process.env.JWT_SECRETKEY,
       {
         expiresIn: "1d"
@@ -60,7 +59,8 @@ const loginUser = async (req, res) => {
     res.json({
       message: "Login successful",
       token,
-      role: user.role
+      role: user.role,
+      username: user.username
     });
 
   }

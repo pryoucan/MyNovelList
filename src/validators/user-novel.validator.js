@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const userNovelSchema = z.object({
+export const userNovelValidator = z.object({
 
     progress:
     z.number().min(0).optional(),
@@ -11,7 +11,7 @@ export const userNovelSchema = z.object({
      .multipleOf(0.5)
      .optional(),
 
-    status:
+    readingStatus:
     z.enum(["Reading", "Completed", 
         "On Hold", "Plan To Read", "Dropped"])
         .default("Reading"),
@@ -24,7 +24,7 @@ export const userNovelSchema = z.object({
 
 }).refine(
     (data) => {
-        if(data.status === "Completed") {
+        if(data.readingStatus === "Completed") {
             return data.completedAt != null;
         }
         return true;

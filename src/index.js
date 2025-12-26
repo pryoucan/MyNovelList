@@ -5,6 +5,7 @@ import cors from "cors";
 import { authRouter } from "./routes/auth.route.js";
 import { globalNovelRouter } from "./routes/global-novel.route.js";
 import { userNovelRouter } from "./routes/user-novel.route.js";
+import { User } from "./models/user.model.js";
 
 const app = express();
 app.use(express.json());
