@@ -1,6 +1,6 @@
 import { GlobalNovel } from "../models/global-novel.model.js"
 
-export const viewNovels = async (req, res) => {
+const viewNovel = async (req, res) => {
 
     try {
         const novels = await GlobalNovel.find({});
@@ -20,7 +20,7 @@ export const viewNovels = async (req, res) => {
     }
 }
 
-export const searchNovel = async (req, res) => {
+const searchNovel = async (req, res) => {
 
     const { q } = req.query;
  
@@ -42,3 +42,5 @@ export const searchNovel = async (req, res) => {
         });
     }
 }
+
+export { viewNovel, searchNovel }

@@ -1,10 +1,10 @@
 import express from "express";
 import dbConnectivity from "./config/db.config.js";
-import { userRouter } from "./routes/user.route.js";
-import { novelRouter } from "./routes/novel.route.js";
-import { adminRouter } from "./routes/admin.route.js";
 import dotenv from 'dotenv';
 import cors from "cors";
+import { authRouter } from "./routes/auth.route.js";
+import { globalNovelRouter } from "./routes/global-novel.route.js";
+import { userNovelRouter } from "./routes/user-novel.route.js";
 
 const app = express();
 app.use(express.json());
@@ -15,7 +15,9 @@ dotenv.config();
 
 const port = process.env.PORT || 3000;
 
-app.use('/api', userRouter, novelRouter, adminRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/novels", globalNovelRouter);
+app.use("/api/users/novels", userNovelRouter);
 
 const runServer = async () => {
     try {

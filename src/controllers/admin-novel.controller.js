@@ -1,20 +1,21 @@
 import { GlobalNovel } from "../models/global-novel.model.js";
 import { NovelAddRequest } from "../models/novel-add-request.model.js"
 
-const viewRequests = async (req, res) => {
+const viewRequest = async (req, res) => {
+    if (req.body.role !== "ADMIN") {
+        return res.status(403).json({ message: "Access denied" });
+    }
     try {
         const novel = await NovelAddRequest.find({});
-        if (novel) {
-            return res.status(200).json({
-                message: "Novel fetched successfully",
-                novels: novel
-            });
-        }
-        else {
+        if (novel.length === 0) {
             return res.status(404).json({
                 message: "No record found"
             });
         }
+        return res.status(200).json({
+            message: "Novel fetched successfully",
+            novels: novel
+        });
     }
     catch (error) {
         return res.status(500).json({
@@ -24,11 +25,13 @@ const viewRequests = async (req, res) => {
 }
 
 
-const approveRequests = async (req, res) => {
+const approveRequest = async (req, res) => {
+    if (req.body.role !== "ADMIN") {
+        return res.status(403).json({ message: "Access denied" });
+    }
     const { novelID } = req.params;
     try {
         const novelToApprove = await NovelAddRequest.findById(novelID);
-
         if (!novelToApprove) {
             return res.status(404).json({
                 message: "Novel not found",
@@ -64,7 +67,10 @@ const approveRequests = async (req, res) => {
 }
 
 
-const rejectRequests = async (req, res) => {
+const rejectRequest = async (req, res) => {
+    if (req.body.role !== "ADMIN") {
+        return res.status(403).json({ message: "Access denied" });
+    }
     const { novelID } = req.params;
     try {
         const novelToReject = await NovelAddRequest.findById(novelID);
@@ -90,4 +96,4 @@ const rejectRequests = async (req, res) => {
     }
 }
 
-export { viewRequests, approveRequests, rejectRequests };
+export { viewRequest, approveRequest, rejectRequest };

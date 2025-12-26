@@ -35,7 +35,7 @@ const globalNovelSchema = new Schema(
       enum: ["Wuxiaworld", "Web Novel"],
       default: null
     },
-    status: {
+    novelStatus: {
       type: String,
       enum: ["Ongoing", "Completed", "On Hiatus", "Cancelled"],
       required: true

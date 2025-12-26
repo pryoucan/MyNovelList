@@ -23,7 +23,7 @@ export const globalNovelSchema = z.object({
     englishPublisher:
     z.enum(["Wuxiaworld", "Web Novel"]).optional(),
 
-    status:
+    novelStatus:
     z.enum(["Ongoing", "Completed", "On Hiatus", "Cancelled"]),
 
     totalChapters:

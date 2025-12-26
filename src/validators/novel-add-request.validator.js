@@ -9,7 +9,7 @@ export const novelAddRequestSchema = z.object({
 
   language: z.enum(["Mandarin", "Korean", "Japanese", "English"]),
 
-  status: z.enum(["Ongoing", "Completed", "On Hiatus", "Cancelled"]),
+  novelStatus: z.enum(["Ongoing", "Completed", "On Hiatus", "Cancelled"]),
 
   synopsis: z.string().optional(),
 
