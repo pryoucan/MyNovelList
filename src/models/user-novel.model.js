@@ -27,7 +27,7 @@ const userNovelSchema = new mongoose.Schema(
       default: null
     },
 
-    readingStatus: {
+    status: {
       type: String,
       enum: ["Reading", "Completed", "On Hold", "Plan To Read", "Dropped"],
       default: "Reading"
