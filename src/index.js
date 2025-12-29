@@ -3,14 +3,8 @@ import dbConnectivity from "./config/db.config.js";
 import dotenv from 'dotenv';
 import cors from "cors";
 import { authRouter } from "./routes/auth.route.js";
-<<<<<<< HEAD:src/index.js
-import { globalNovelRouter } from "./routes/global-novel.route.js";
-import { userNovelRouter } from "./routes/user-novel.route.js";
-import { User } from "./models/user.model.js";
-=======
 import { novelRouter } from "./routes/global-novel.route.js";
 import { userNovelRouter } from "./routes/user-novel.route.js";
->>>>>>> e649d7f (improve api routes and endpoint, add improve controllers):index.js
 
 const app = express();
 app.use(express.json());
@@ -22,11 +16,8 @@ dotenv.config();
 const port = process.env.PORT || 3000;
 
 app.use("/api/auth", authRouter);
-<<<<<<< HEAD:src/index.js
 app.use("/api/novels", globalNovelRouter);
-=======
 app.use("/api/novels", novelRouter);
->>>>>>> e649d7f (improve api routes and endpoint, add improve controllers):index.js
 app.use("/api/users/novels", userNovelRouter);
 
 const runServer = async () => {
