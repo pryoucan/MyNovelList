@@ -154,29 +154,29 @@ const addNovel = async (req, res) => {
 };
 
 const editNovel = async (req, res) => {
-  const { userNovelId } = req.params;
-  const { status, progress, rating, startedAt, completedAt } = req.body;
+  const { novelId } = req.params;
+  const safeReqBody = req.body || {};
+  const { status, progress, rating, startedAt, completedAt } = safeReqBody;
 
-  if (!userNovelId) {
+  if (!novelId) {
     return res.status(400).json({ message: "Novel id is required" });
   }
 
   try {
-    const userNovel = await UserNovel.findOne({ _id: userNovelId, user: req.user.id });
+    const userNovel = await UserNovel.findOne({ _id: novelId, user: req.user.id });
     if (!userNovel) {
       return res.status(404).json({ message: "Novel not found" });
     }
+    const globalNovelId = userNovel.novel;
 
-    const novelId = userNovel.novel;
-
-    const novel = await GlobalNovel.findById(novelId);
+    const novel = await GlobalNovel.findById(globalNovelId);
     if(!novel) {
       return res.status(404).json({ message: "Novel not found" });
     }
 
     const upcomingForbiddenStatus = ["Reading", "Completed", "On Hold", "Dropped"];
     if (status !== undefined &&
-      novel.publication.status === "Upcoming" &&
+      novel.publication?.status === "Upcoming" &&
       upcomingForbiddenStatus.includes(status)
     ) {
       return res.status(400).json({
@@ -185,8 +185,8 @@ const editNovel = async (req, res) => {
       });
     }
 
-    if (
-      (novel.publication.status === "Upcoming") &&
+    if (status !== undefined &&
+      (novel.publication?.status === "Upcoming") &&
       (progress !== undefined ||
         rating !== undefined ||
         startedAt !== undefined ||
@@ -216,14 +216,14 @@ const editNovel = async (req, res) => {
 
     const updates = {};
     for (const key of allowed_fields) {
-      if (req.body[key] !== undefined) {
-        updates[key] = key === "progress" ? progressCount : req.body[key];
+      if (safeReqBody[key] !== undefined) {
+        updates[key] = key === "progress" ? progressCount : safeReqBody[key];
       }
     }
 
     const updatedEntry = await UserNovel.findOneAndUpdate(
       {
-        _id: userNovelId,
+        _id: novelId,
         user: req.user.id,
       },
       updates,
@@ -238,8 +238,11 @@ const editNovel = async (req, res) => {
       updatedEntry,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
-  }
+  console.error("editNovel error:", error);
+  return res.status(500).json({
+    message: error.message || "Something went wrong",
+  });
+}
 };
 
 const deleteNovel = async (req, res) => {

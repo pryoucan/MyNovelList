@@ -12,7 +12,7 @@ const viewNovel = async (req, res) => {
 
         return res.status(200).json({
             message: "Novel fetched successfully",
-            novel: novels
+            novels
         });
     }
     catch(error) {
