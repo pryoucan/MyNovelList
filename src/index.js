@@ -16,7 +16,6 @@ dotenv.config();
 const port = process.env.PORT || 3000;
 
 app.use("/api/auth", authRouter);
-app.use("/api/novels", globalNovelRouter);
 app.use("/api/novels", novelRouter);
 app.use("/api/users/novels", userNovelRouter);
 
