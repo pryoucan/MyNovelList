@@ -4,32 +4,14 @@ import { UserNovel } from "../models/user-novel.model.js"
 const viewNovel = async (req, res) => {
   try {
     const userId = req.user.id;
-    const novel = await UserNovel.find({ user: userId })
-      .populate({
-        path: "novel",
-        select: `
-      englishTitle
-      alternativeTitles
-      author
-      language
-      completelyTranslated
-      originalPublisher
-      englishPublisher
-      status
-      totalChapters
-      synopsis
-      genre
-      startYear
-      finishedYear
-      `
-      })
-      ;
-    if (novel.length === 0) {
+    const novels = await UserNovel.find({ user: userId })
+
+    if (novels.length === 0) {
       return res.status(404).json({ message: "Novel is empty" });
     }
     return res.status(200).json({
       message: "Novels fetched successfully",
-      novels: novel,
+      novels
     });
   }
   catch (error) {
@@ -39,10 +21,38 @@ const viewNovel = async (req, res) => {
 };
 
 
-const searchNovel = async (req, res) => {
+const getUserNovel = async (req, res) => {
+  try {
+    const { novelId } = req.params;
+    const userId = req.user.id;
+    if (!novelId) {
+      return res.status(401).json({ message: "Novel id is required" });
+    }
+
+    const novel = await UserNovel.findOne({ user: userId, novel: novelId });
+
+    if (!novel) {
+      return res.status(404).json({
+        message: "Novel not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Novel found successfully",
+      novel,
+    });
+  }
+  catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+
+const searchNovelByName = async (req, res) => {
   try {
     const { name } = req.query;
-    if (!name) {
+    if (name.length === 0) {
       return res.status(401).json({ message: "Novel name is required" });
     }
 
@@ -52,7 +62,7 @@ const searchNovel = async (req, res) => {
       user: userId,
     });
 
-    if (!novels.length) {
+    if (!novels) {
       return res.status(404).json({
         message: "Novel not found",
       });
@@ -102,7 +112,7 @@ const addNovel = async (req, res) => {
 
     if ((novel.publication.status === "Upcoming" ||
       novel.publication.status === "Plan To Read") && (progress > 0 ||
-      rating !== null || startedAt !== null || completedAt !== null)) {
+        rating !== null || startedAt !== null || completedAt !== null)) {
       return res.status(400).json({
         message: `You cannot set progress, rating, or dates for an unreleased 
         or Plan To Read novel`
@@ -112,17 +122,17 @@ const addNovel = async (req, res) => {
     if (typeof progress === "number" &&
       novel.chapterCount > 0 &&
       progress > novel.chapterCount) {
-        progress = novel.chapterCount;
+      progress = novel.chapterCount;
     }
 
     const userNovel = await UserNovel.create({
+      user: req.user.id,
       novel: novelId,
       status,
       progress,
       rating,
       startedAt,
       completedAt,
-      user: req.user.id,
     });
 
     return res.status(200).json({
@@ -134,6 +144,7 @@ const addNovel = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 }
+
 
 const editNovel = async (req, res) => {
   const { status, chapter, startedAt, completedAt } = req.body;
@@ -199,4 +210,5 @@ const deleteNovel = async (req, res) => {
   }
 };
 
-export { viewNovel, searchNovel, addNovel, editNovel, deleteNovel };
+
+export { viewNovel, getUserNovel, searchNovelByName, addNovel, editNovel, deleteNovel };
