@@ -1,11 +1,5 @@
 import { User } from "../models/user.model.js";
-import { redis } from "../config/redis.config.js";
-import { otpGenerator } from "../utils/otp-generator.js";
-import { transporter } from "../config/mail-transporter.config.js";
-
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-
 
 const registerUser = async (req, res) => {
   try {
@@ -77,123 +71,49 @@ const loginUser = async (req, res) => {
 };
 
 
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
-  }
+// const resetPassword = async (req, res) => {
+//   const { otp } = req.body;
+//   const ogOTP = req.otp;
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.json({ ok: 200 });
-    }
+//   if (otp !== ogOTP) {
+//     return res.status(400).json({ message: "OTP is incorrect" });
+//   }
+//   try {
+//     let newUserPassword = req.body;
+//     const userEmail = req.user.email;
+//     const userId = req.user.id;
 
-    const saveOtp = otpGenerator(6, 35);
-    const otpToStore = await bcrypt.hash(saveOtp, 10);
-    console.log(saveOtp);
-    console.log(otpToStore);
-    const key = `otp:${email}`;
-    await redis.set(key, otpToStore, { ex: 600 });
+//     const user = await Novel.findOne({ email: userEmail, user: userId });
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
 
-    const otp = await redis.get(key);
+//     const matchNewAndOldPassword = user.matchPassword(newUserPassword);
+//     if (matchNewAndOldPassword) {
+//       return res.status(400).json({
+//         message: "New password cannont be the same as old one"
+//       });
+//     }
 
-    const info = await transporter.sendMail({
-      from: `"MyNovelList" <${process.env.G_MAIL}>`,
-      to: email,
-      subject: "Your verification code",
-      text: `Your OTP is ${saveOtp}. It expires in 10 minutes.`,
-    });
+//     newUserPassword = await bcrypt.hash(newUserPassword, 10);
 
-    console.log("Email sent:", info.messageId);
+//     const updatedPassword = await Novel.findOneAndUpdate(
+//       {
+//         email: userEmail, userPassword: password, user: userId
+//       },
+//       {
+//         password: newUserPassword
+//       },
+//       {
+//         new: true
+//       }
+//     ).lean();
 
-    return res.status(200).json({ message: 
-      `If you have an account, we have sent an verification code to ${email}`})
-  }
-  catch (error) {
-    console.log(error)
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
-  }
-};
+//     return res.status(201).json({ message: "Password updated successfully" });
+//   }
+//   catch (error) {
+//     return res.status(500).json({ message: "Something went wrong" });
+//   }
+// }
 
-
-const verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
-  if(!email || !otp) {
-    return res.status(400).json({ message: "Enter required fields" });
-  }
-
-  try {
-    const key = `otp:${email}`
-    const dbOtp = await redis.get(key);
-    if(!(await bcrypt.compare(otp, dbOtp))) {
-      return res.status(400).json({ message: "Invalid or expired otp" });
-    }
-
-    const user = await User.findOne({ email });
-    if(!user) {
-      res.status(404).json({ message: "User not found" });
-    }
-
-    const resetToken = await jwt.sign(
-      { id: user._id,
-        purpose: "reset_password"
-      }, 
-      process.env.JWT_SECRETKEY, 
-      {
-        expiresIn: "5m"
-      }
-    );
-
-    await redis.del(key);
-
-    return res.status(200).json({ message: "Otp verified", resetToken });
-  }
-  catch(error) {
-    return res.status(500).json({ message: "Something went wrong" });
-  }
-}
-
-
-const resetPassword = async (req, res) => {
-  const { password } = req.body;
-  if(!password) {
-    return res.status(400).json({ message: "Password is required" });
-  }
-  try {
-    const user = await User.findById({ _id: req.user.id });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const matchNewAndOldPassword = await user.matchPassword(password);
-    if (matchNewAndOldPassword) {
-      return res.status(400).json({
-        message: "New password cannot be same as the old one"
-      });
-    }
-
-    const newPassword = await bcrypt.hash(password, 10);
-
-    await User.findOneAndUpdate(
-      {
-        _id: req.user.id
-      },
-      {
-        password: newPassword
-      },
-      {
-        new: true
-      }
-    )
-
-    return res.status(201).json({ message: "Password updated successfully" });
-  }
-  catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
-  }
-}
-
-export { registerUser, loginUser, forgotPassword, verifyOtp, resetPassword };
+export { registerUser, loginUser };

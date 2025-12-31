@@ -10,15 +10,10 @@ const userAuthentication = async (req, res, next) => {
   try {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
-    if(!decoded.purpose || decoded.purpose !== "reset_password") {
-      req.user = { id: decoded.id, role: decoded.role, username: decoded.username };
-    }
-
-    req.user = { id: decoded.id, purpose: decoded.purpose };
+    req.user = { id: decoded.id, role: decoded.role, username: decoded.username };
 
     next();
   } catch (error) {
-    console.log(error);
     return res.status(401).json({ message: "Invalid token" });
   }
 };
