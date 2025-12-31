@@ -19,7 +19,7 @@ const viewUserNovel = async (req, res) => {
   }
 };
 
-const getUserNovel = async (req, res) => {
+const getUserNovelById = async (req, res) => {
   try {
     const { novelId } = req.params;
     const userId = req.user.id;
@@ -27,7 +27,7 @@ const getUserNovel = async (req, res) => {
       return res.status(401).json({ message: "Novel id is required" });
     }
 
-    const novel = await UserNovel.findOne({ user: userId, novel: novelId });
+    const novel = await UserNovel.findOne({ user: userId, _id: novelId });
 
     if (!novel) {
       return res.status(404).json({
@@ -45,16 +45,16 @@ const getUserNovel = async (req, res) => {
   }
 };
 
-const searchUserNovelByName = async (req, res) => {
+const getUserNovelByName = async (req, res) => {
   try {
-    const { name } = req.query;
+    const { n } = req.query;
     if (name.length === 0) {
       return res.status(401).json({ message: "Novel name is required" });
     }
 
     const userId = req.user.id;
     const novels = await UserNovel.find({
-      name: { $regex: name, $options: "i" },
+      n: { $regex: n, $options: "i" },
       user: userId,
     });
 
@@ -76,7 +76,7 @@ const searchUserNovelByName = async (req, res) => {
 
 const addUserNovel = async (req, res) => {
   const { novelId } = req.params;
-  const { status, progress, rating, startedAt, completedAt } = req.body;
+  const { status, progress, rating, startedAt, completedAt } = req.body || {};
 
   if (!novelId) {
     return res.status(400).json({ message: "Novel id is required" });
@@ -115,13 +115,24 @@ const addUserNovel = async (req, res) => {
 
     if (
       (novel.publication.status === "Upcoming") &&
-      (progress !== undefined ||
+      (progress !== undefined && status !== "Plan To Read" ||
         rating !== undefined ||
         startedAt !== undefined ||
         completedAt !== undefined)
     ) {
       return res.status(400).json({
         message: `You cannot set progress, rating, or dates for an unreleased novel`,
+      });
+    }
+
+    if(status === "Plan To Read" &&
+      progress !== undefined ||
+      rating !== undefined ||
+      startedAt !== undefined ||
+      completedAt !== undefined
+    ) {
+      return res.status(400).json({
+        message: "You cannot set any field if the status is Plan To Read" 
       });
     }
 
@@ -149,27 +160,28 @@ const addUserNovel = async (req, res) => {
       userNovel,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 const editUserNovel = async (req, res) => {
-  const { userNovelId } = req.params;
-  const { status, progress, rating, startedAt, completedAt } = req.body;
+  const { novelId } = req.params;
+  const { status, progress, rating, startedAt, completedAt } = req.body || {};
 
-  if (!userNovelId) {
+  if (!novelId) {
     return res.status(400).json({ message: "Novel id is required" });
   }
 
   try {
-    const userNovel = await UserNovel.findOne({ _id: userNovelId, user: req.user.id });
+    const userNovel = await UserNovel.findOne({ _id: novelId, user: req.user.id });
     if (!userNovel) {
       return res.status(404).json({ message: "Novel not found" });
     }
 
-    const novelId = userNovel.novel;
+    const globalNovelId = userNovel.novel;
 
-    const novel = await GlobalNovel.findById(novelId);
+    const novel = await GlobalNovel.findById(globalNovelId);
     if(!novel) {
       return res.status(404).json({ message: "Novel not found" });
     }
@@ -194,6 +206,17 @@ const editUserNovel = async (req, res) => {
     ) {
       return res.status(400).json({
         message: `You cannot set progress, rating, or dates for an unreleased novel`,
+      });
+    }
+    
+    if(status === "Plan To Read" &&
+      progress !== undefined ||
+      rating !== undefined ||
+      startedAt !== undefined ||
+      completedAt !== undefined
+    ) {
+      return res.status(400).json({
+        message: "You cannot set any field if the status is Plan To Read" 
       });
     }
 
@@ -223,7 +246,7 @@ const editUserNovel = async (req, res) => {
 
     const updatedEntry = await UserNovel.findOneAndUpdate(
       {
-        _id: userNovelId,
+        _id: novelId,
         user: req.user.id,
       },
       updates,
@@ -266,8 +289,8 @@ const deleteUserNovel = async (req, res) => {
 
 export {
   viewUserNovel,
-  getUserNovel,
-  searchUserNovelByName,
+  getUserNovelById,
+  getUserNovelByName,
   addUserNovel,
   editUserNovel,
   deleteUserNovel
