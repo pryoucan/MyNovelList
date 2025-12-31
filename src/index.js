@@ -11,16 +11,18 @@ import { userNovelRouter } from "./routes/user-novel.route.js";
 
 const app = express();
 
+app.disable("etag");
+
 app.use(express.json());
 app.use(express.urlencoded());
 
 app.use(cors({
-  origin: 
-  [
+  origin: [
     "http://localhost:8080",
     "https://verdant-bubblegum-d63144.netlify.app"
   ],
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 const PORT = process.env.PORT || 3000;
