@@ -13,8 +13,9 @@ const userAuthentication = async (req, res, next) => {
     if(!decoded.purpose || decoded.purpose !== "reset_password") {
       req.user = { id: decoded.id, role: decoded.role, username: decoded.username };
     }
-
-    req.user = { id: decoded.id, purpose: decoded.purpose };
+    else {
+      req.user = { id: decoded.id, purpose: decoded.purpose };
+    }
 
     next();
   } catch (error) {
