@@ -1,19 +1,35 @@
-import express from "express";
+import "./bootstrap.js";
+
 import dbConnectivity from "./config/db.config.js";
-import dotenv from 'dotenv';
+
+import express from "express";
 import cors from "cors";
+
 import { authRouter } from "./routes/auth.route.js";
 import { novelRouter } from "./routes/global-novel.route.js";
 import { userNovelRouter } from "./routes/user-novel.route.js";
 
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(cors());
 
-dotenv.config();
+app.use(cors({
+  origin: 
+  [
+    "http://localhost:8080",
+    "https://your-frontend.netlify.app"
+  ],
+  credentials: true
+}));
 
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
+
+app.set("trust proxy", 1);
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/novels", novelRouter);
@@ -22,8 +38,8 @@ app.use("/api/users/novels", userNovelRouter);
 const runServer = async () => {
     try {
         await dbConnectivity();
-        app.listen(port, () => {
-            console.log(`server is running on port ${port}`);
+        app.listen(PORT, () => {
+            console.log(`server is running on port ${PORT}`);
         });
     }
     catch(error) {
