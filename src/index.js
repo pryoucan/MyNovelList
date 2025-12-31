@@ -18,7 +18,7 @@ app.use(cors({
   origin: 
   [
     "http://localhost:8080",
-    "https://your-frontend.netlify.app"
+    "https://verdant-bubblegum-d63144.netlify.app/"
   ],
   credentials: true
 }));

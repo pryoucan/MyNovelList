@@ -1,7 +1,5 @@
 node_modules/
 
-mail-transporter.config.js
-
 .env
 
 dist/
