@@ -1,7 +1,7 @@
 import { GlobalNovel } from "../models/global-novel.model.js";
 import { UserNovel } from "../models/user-novel.model.js";
 
-const viewNovel = async (req, res) => {
+const viewUserNovel = async (req, res) => {
   try {
     const userId = req.user.id;
     const novels = await UserNovel.find({ user: userId });
@@ -45,7 +45,7 @@ const getUserNovel = async (req, res) => {
   }
 };
 
-const searchNovelByName = async (req, res) => {
+const searchUserNovelByName = async (req, res) => {
   try {
     const { name } = req.query;
     if (name.length === 0) {
@@ -74,7 +74,7 @@ const searchNovelByName = async (req, res) => {
   }
 };
 
-const addNovel = async (req, res) => {
+const addUserNovel = async (req, res) => {
   const { novelId } = req.params;
   const { status, progress, rating, startedAt, completedAt } = req.body;
 
@@ -153,7 +153,7 @@ const addNovel = async (req, res) => {
   }
 };
 
-const editNovel = async (req, res) => {
+const editUserNovel = async (req, res) => {
   const { userNovelId } = req.params;
   const { status, progress, rating, startedAt, completedAt } = req.body;
 
@@ -242,7 +242,7 @@ const editNovel = async (req, res) => {
   }
 };
 
-const deleteNovel = async (req, res) => {
+const deleteUserNovel = async (req, res) => {
   try {
     const { novelId } = req.params;
     const userId = req.user.id;
@@ -265,10 +265,10 @@ const deleteNovel = async (req, res) => {
 };
 
 export {
-  viewNovel,
+  viewUserNovel,
   getUserNovel,
-  searchNovelByName,
-  addNovel,
-  editNovel,
-  deleteNovel,
+  searchUserNovelByName,
+  addUserNovel,
+  editUserNovel,
+  deleteUserNovel
 };

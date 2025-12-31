@@ -1,10 +1,9 @@
 import { GlobalNovel } from "../models/global-novel.model.js"
 
 const viewNovel = async (req, res) => {
-
     try {
         const novels = await GlobalNovel.find({});
-        if(novels.length === 0) {
+        if(!novels.length) {
             return res.status(404).json({
                 message: "Novel not found"
             });
@@ -20,20 +19,20 @@ const viewNovel = async (req, res) => {
     }
 }
 
-const searchNovel = async (req, res) => {
 
-    const { q } = req.query;
- 
+const getNovelById = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        const novels = await GlobalNovel.find({ $text: { $search: q } });
-        if(novels.length === 0) {
+        const novel = await GlobalNovel.findById(id);
+        if(novel.length === 0) {
             return res.status(404).json({
                 message: "No novels found"
             });
         }
         return res.status(200).json({
             message: "Novel found",
-            novel: novels
+            novel
         });
     }
     catch(error) {
@@ -43,4 +42,28 @@ const searchNovel = async (req, res) => {
     }
 }
 
-export { viewNovel, searchNovel }
+
+const getNovelByName = async (req, res) => {
+    const { q } = req.query;
+    if(!q) {
+        return res.status(400).json({ message: "Novel name required" });
+    }
+
+    try {
+        const novels = await GlobalNovel.find({ $text: { $search: q } });
+        if(!novels.length) {
+            return res.status(404).json({ message: "Novel not found"});
+        }
+
+        return res.status(200).json({
+            message: "Novel found",
+            novels
+        });
+    }
+    catch(error) {
+        console.log(error)
+        return res.status(500).json({ message: "Something went wrong" });
+    }
+}
+
+export { viewNovel, getNovelById, getNovelByName };

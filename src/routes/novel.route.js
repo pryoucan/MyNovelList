@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { searchNovel, viewNovel } from "../controllers/global-novel.controller.js";
+import { viewNovel, getNovelById, getNovelByName } from "../controllers/global-novel.controller.js";
 import { userAuthentication } from "../middlewares/auth-user.middleware.js";
 import { validate } from "../middlewares/validator.middleware.js";
 import { novelAddRequestValidator } from "../validators/novel-add-request.validator.js";
@@ -9,8 +9,14 @@ import { approveRequest, rejectRequest, viewRequest } from "../controllers/admin
 
 const novelRouter = Router();
 
-novelRouter.get("/", viewNovel);
-novelRouter.get("/:q", searchNovel);
+novelRouter.get("/", async (req, res) => {
+    if(req.query.q) {
+        return getNovelByName(req, res);
+    }
+    return viewNovel(req, res);
+});
+
+novelRouter.get("/:id", getNovelById);
 novelRouter.post("/add", 
     userAuthentication,
     validate(novelAddRequestValidator),
