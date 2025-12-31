@@ -1,17 +1,20 @@
+import "./bootstrap.js";
+
 import express from "express";
-import dbConnectivity from "./config/db.config.js";
-import dotenv from 'dotenv';
 import cors from "cors";
+
+import dbConnectivity from "./config/db.config.js";
 import { authRouter } from "./routes/auth.route.js";
 import { novelRouter } from "./routes/global-novel.route.js";
 import { userNovelRouter } from "./routes/user-novel.route.js";
+import { transporter } from "./config/mail-transporter.config.js";
+
 
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
-dotenv.config();
 
 const port = process.env.PORT || 3000;
 
