@@ -113,24 +113,25 @@ const addUserNovel = async (req, res) => {
       });
     }
 
-    if (
-      (novel.publication.status === "Upcoming") &&
-      (progress !== undefined && status !== "Plan To Read" ||
-        rating !== undefined ||
-        startedAt !== undefined ||
-        completedAt !== undefined)
-    ) {
+    if ((novel.publication.status === "Upcoming") &&
+    (
+      progress !== undefined ||
+      rating !== undefined ||
+      startedAt !== undefined ||
+      completedAt !== undefined
+    )) {
       return res.status(400).json({
         message: `You cannot set progress, rating, or dates for an unreleased novel`,
       });
     }
 
-    if(status === "Plan To Read" &&
-      progress !== undefined ||
-      rating !== undefined ||
-      startedAt !== undefined ||
-      completedAt !== undefined
-    ) {
+    if((status === "Plan To Read") &&
+      (
+        progress !== undefined ||
+        rating !== undefined ||
+        startedAt !== undefined ||
+        completedAt !== undefined
+    )) {
       return res.status(400).json({
         message: "You cannot set any field if the status is Plan To Read" 
       });
@@ -209,12 +210,13 @@ const editUserNovel = async (req, res) => {
       });
     }
     
-    if(status === "Plan To Read" &&
-      progress !== undefined ||
-      rating !== undefined ||
-      startedAt !== undefined ||
-      completedAt !== undefined
-    ) {
+    if((status === "Plan To Read") &&
+      (
+        progress !== undefined ||
+        rating !== undefined ||
+        startedAt !== undefined ||
+        completedAt !== undefined
+    )) {
       return res.status(400).json({
         message: "You cannot set any field if the status is Plan To Read" 
       });
@@ -240,7 +242,12 @@ const editUserNovel = async (req, res) => {
     const updates = {};
     for (const key of allowed_fields) {
       if (req.body[key] !== undefined) {
-        updates[key] = key === "progress" ? progressCount : req.body[key];
+        if(key === "progress") {
+          updates[key] = progressCount;
+        }
+        else {
+          updates[key] = req.body[key];
+        }
       }
     }
 
