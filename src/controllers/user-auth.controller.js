@@ -1,11 +1,12 @@
 import { User } from "../models/user.model.js";
 import { redis } from "../config/redis.config.js";
 import { otpGenerator } from "../utils/otp-generator.js";
-import { transporter } from "../config/mail-transporter.config.js";
 
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const registerUser = async (req, res) => {
   try {
@@ -91,28 +92,20 @@ const forgotPassword = async (req, res) => {
 
     const saveOtp = otpGenerator(6, 35);
     const otpToStore = await bcrypt.hash(saveOtp, 10);
-    console.log(saveOtp);
-    console.log(otpToStore);
     const key = `otp:${email}`;
     await redis.set(key, otpToStore, { ex: 600 });
 
-    const otp = await redis.get(key);
-
-    const info = await transporter.sendMail({
-      from: `"MyNovelList" <${process.env.G_MAIL}>`,
+    await resend.emails.send({
+      from: "MNL Auth <onboarding@resend.dev>",
       to: email,
-      subject: "Your verification code",
-      text: `Your OTP is ${saveOtp}. It expires in 10 minutes.`,
+      subject: "Your verification Code",
+      text: `Your OTP is ${saveOtp}. It expires in 10 minutes.`
     });
 
-    console.log("Email sent:", info.messageId);
-
     return res.status(200).json({ message: 
-      `If you have an account, we have sent an verification code to ${email}`})
+      `If an account exists, a verification code has been sent.`})
   }
   catch (error) {
-    console.log(error)
-    console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -127,13 +120,16 @@ const verifyOtp = async (req, res) => {
   try {
     const key = `otp:${email}`
     const dbOtp = await redis.get(key);
+    if(!dbOtp) {
+      return res.status(400).json({ message: "Invalid or expired otp" })
+    }
     if(!(await bcrypt.compare(otp, dbOtp))) {
       return res.status(400).json({ message: "Invalid or expired otp" });
     }
 
     const user = await User.findOne({ email });
     if(!user) {
-      res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const resetToken = await jwt.sign(
@@ -167,7 +163,7 @@ const resetPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (!(await user.matchPassword(password))) {
+    if (await user.matchPassword(password)) {
       return res.status(400).json({
         message: "New password cannot be same as the old one"
       });
