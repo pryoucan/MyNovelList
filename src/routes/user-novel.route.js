@@ -3,6 +3,7 @@ import
 { 
     addUserNovel, deleteUserNovel, 
     editUserNovel, 
+    getUserNovelByGId, 
     getUserNovelById, 
     getUserNovelByName,
     viewUserNovel, 
@@ -20,6 +21,7 @@ userNovelRouter.get("/", userAuthentication, async (req, res) => {
     return viewUserNovel(req, res);
 });
 
+userNovelRouter.get("/by-global/:novelId", userAuthentication, getUserNovelByGId);
 userNovelRouter.get("/:novelId", userAuthentication, getUserNovelById)
 userNovelRouter.post("/:novelId", userAuthentication, addUserNovel);
 userNovelRouter.patch("/:novelId", userAuthentication, editUserNovel);

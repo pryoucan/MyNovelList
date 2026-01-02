@@ -19,6 +19,27 @@ const viewUserNovel = async (req, res) => {
   }
 };
 
+const getUserNovelByGId = async (req, res) => {
+  const { novelId } = req.params;
+  if(!novelId) {
+    return res.status(400).json({ message: "Global Novel Id required" });
+  } 
+
+  try {
+    const novel = await UserNovel.findOne({ novel: novelId });
+    if(!novel) {
+      return res.status(404).json({ message: "Novel not found" });
+    }
+
+    return res.status(200).json({ message: "Novel found successfully",
+      novel
+    });
+  }
+  catch(error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 const getUserNovelById = async (req, res) => {
   try {
     const { novelId } = req.params;
@@ -296,6 +317,7 @@ const deleteUserNovel = async (req, res) => {
 
 export {
   viewUserNovel,
+  getUserNovelByGId,
   getUserNovelById,
   getUserNovelByName,
   addUserNovel,
