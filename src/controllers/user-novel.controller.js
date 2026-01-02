@@ -26,7 +26,7 @@ const getUserNovelByGId = async (req, res) => {
   } 
 
   try {
-    const novel = await UserNovel.findOne({ novel: novelId });
+    const novel = await UserNovel.findOne({ novel: novelId, user: res.user.id });
     if(!novel) {
       return res.status(404).json({ message: "Novel not found" });
     }
