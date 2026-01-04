@@ -23,9 +23,9 @@ novelRouter.post("/add",
     novelAddRequest
 );
 
-novelRouter.get("/view/request", userAuthentication, viewRequest);
-novelRouter.delete("/approve/request/:novelId", userAuthentication, approveRequest);
-novelRouter.delete("/reject/request/:novelId", userAuthentication, rejectRequest);
+novelRouter.get("/view-request", userAuthentication, viewRequest);
+novelRouter.delete("/approve-request/:novelId", userAuthentication, approveRequest);
+novelRouter.delete("/reject-request/:novelId", userAuthentication, rejectRequest);
 
 
 export { novelRouter };
