@@ -1,4 +1,4 @@
-### This a a novel tracking backend service, where users can track their novel progress in real time.
+### This is a novel tracking backend service, where users can track their novel progress in real time.
 To prevent incorrect, duplicate, or low quality novel entries, users cannot directly add novels to the global db.
 
 Instead:
